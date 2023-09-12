@@ -1,0 +1,51 @@
+import tkinter as tk
+from tkinter import messagebox
+import random
+
+class Hangman:
+    def __init__(self, root):
+        self.root = root
+        self.root.title("Hangman Game")
+
+        self.word_list = ["python", "hangman", "programming", "tkinter", "development"]
+        self.word = random.choice(self.word_list)
+        self.guess_word = ["_"] * len(self.word)
+        self.attempts = 6
+
+        self.label = tk.Label(root, text=" ".join(self.guess_word), font=("Arial", 24))
+        self.label.pack(pady=20)
+
+        self.entry = tk.Entry(root)
+        self.entry.pack(pady=20)
+
+        self.button = tk.Button(root, text="Guess", command=self.guess)
+        self.button.pack()
+
+        self.attempts_label = tk.Label(root, text=f"Attempts left: {self.attempts}", font=("Arial", 16))
+        self.attempts_label.pack(pady=20)
+
+    def guess(self):
+        letter = self.entry.get()
+        if len(letter) != 1:
+            messagebox.showinfo("Hangman", "Please enter only one letter!")
+            return
+        if letter in self.word:
+            for idx, char in enumerate(self.word):
+                if char == letter:
+                    self.guess_word[idx] = letter
+            self.label.config(text=" ".join(self.guess_word))
+        else:
+            self.attempts -= 1
+            self.attempts_label.config(text=f"Attempts left: {self.attempts}")
+
+        if "_" not in self.guess_word:
+            messagebox.showinfo("Hangman", "Congratulations! You won!")
+            self.root.quit()
+        elif self.attempts == 0:
+            messagebox.showinfo("Hangman", f"You lost! The word was: {self.word}")
+            self.root.quit()
+
+if __name__ == "__main__":
+    root = tk.Tk()
+    game = Hangman(root)
+    root.mainloop()
