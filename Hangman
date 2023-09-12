@@ -7,10 +7,14 @@ class Hangman:
         self.root = root
         self.root.title("Hangman Game")
 
-        self.word_list = ["python", "hangman", "programming", "tkinter", "development"]
-        self.word = random.choice(self.word_list)
+        # Get a random word from words.txt
+        self.word = self.get_random_word_from_file("words.txt")
         self.guess_word = ["_"] * len(self.word)
         self.attempts = 6
+
+        self.canvas = tk.Canvas(root, width=300, height=300)
+        self.canvas.pack(pady=20)
+        self.draw_hangman()
 
         self.label = tk.Label(root, text=" ".join(self.guess_word), font=("Arial", 24))
         self.label.pack(pady=20)
@@ -23,6 +27,30 @@ class Hangman:
 
         self.attempts_label = tk.Label(root, text=f"Attempts left: {self.attempts}", font=("Arial", 16))
         self.attempts_label.pack(pady=20)
+
+    def get_random_word_from_file(self, filename):
+        with open(filename, "r") as file:
+            words = file.read().split()  # Split words by spaces
+            return random.choice(words)
+
+    def draw_hangman(self):
+        self.canvas.delete("all")
+        if self.attempts <= 5:  # Draw base
+            self.canvas.create_line(50, 250, 150, 250)
+        if self.attempts <= 4:  # Draw pole
+            self.canvas.create_line(100, 250, 100, 50)
+        if self.attempts <= 3:  # Draw top line
+            self.canvas.create_line(100, 50, 200, 50)
+        if self.attempts <= 2:  # Draw rope
+            self.canvas.create_line(200, 50, 200, 80)
+        if self.attempts <= 1:  # Draw head
+            self.canvas.create_oval(170, 80, 230, 140)
+        if self.attempts == 0:  # Draw body
+            self.canvas.create_line(200, 140, 200, 200)
+            self.canvas.create_line(200, 150, 170, 180)  # Left arm
+            self.canvas.create_line(200, 150, 230, 180)  # Right arm
+            self.canvas.create_line(200, 200, 170, 230)  # Left leg
+            self.canvas.create_line(200, 200, 230, 230)  # Right leg
 
     def guess(self):
         letter = self.entry.get()
@@ -37,6 +65,7 @@ class Hangman:
         else:
             self.attempts -= 1
             self.attempts_label.config(text=f"Attempts left: {self.attempts}")
+            self.draw_hangman()
 
         if "_" not in self.guess_word:
             messagebox.showinfo("Hangman", "Congratulations! You won!")
